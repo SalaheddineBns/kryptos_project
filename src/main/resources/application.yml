@@ -1,0 +1,19 @@
+
+
+
+spring:
+  application:
+    name: identity-crypto-service
+  datasource:
+    url: jdbc:h2:mem:testdb
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+jwt:
+  secret: "xzUJZImXQvFJIrrVTa7wKF1mt9c3pnv0O4gx4YOrZtxuCEs2CwTWEL3nTJSZrjDQGLblkeGGVIKbeaaXd03II4Ejo2gKVJDk7SIn"
+  expiration: 3600000  # Exemple: 1 heure (en ms)
+server:
+  port: 8889
+
+
