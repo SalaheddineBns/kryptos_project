@@ -1,5 +1,5 @@
 import "./App.css";
-import NavBar from "./components/Navbar";
+import NavBar from "./components/NavBar";
 import Dashboard from "./pages/Dashboard";
 import FavoriteCrypto from "./pages/FavoriteCrypto";
 import Login from "./pages/Login";

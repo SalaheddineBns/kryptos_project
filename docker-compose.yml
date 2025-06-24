@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  identity-crypto:
+    build:
+      context: ./identity-crypto-service
+      dockerfile: Dockerfile
+    image: identity-crypto:1.0
+    ports:
+      - "8889:8889"
+    container_name: identity-crypto
+
+  alert-crypto:
+    build:
+      context: ./ms-crypto-alerts
+      dockerfile: Dockerfile
+    image: alert-crypto:1.0
+    ports:
+      - "9999:9999"
+    container_name: alert-crypto
+
+  ms-crypto:
+    build:
+      context: ./ms-crypto
+      dockerfile: Dockerfile
+    image: ms-crypto:1.0
+    ports:
+      - "8999:8999"
+    container_name: ms-crypto
+
+  chatbot-crypto:
+    build:
+      context: ./ms-crypto-chatBot
+      dockerfile: Dockerfile
+    image: chatbot-crypto:1.0
+    ports:
+      - "8888:8888"
+    container_name: chatbot-crypto
+
+  wallet-crypto:
+    build:
+      context: ./ms-crypto-wallet
+      dockerfile: Dockerfile
+    image: wallet-crypto:1.0
+    ports:
+      - "9090:9090"
+    container_name: wallet-crypto
+
+  front-crypto:
+    build:
+      context: ./front_Kryptos
+      dockerfile: Dockerfile
+    image: front-crypto:1.0
+    ports:
+      - "5173:5173"
+    container_name: front-crypto
+    depends_on:
+      - identity-crypto
+      - alert-crypto
+      - ms-crypto
+      - chatbot-crypto
+      - wallet-crypto
+    restart: unless-stopped
