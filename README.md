@@ -5,7 +5,7 @@ Projet global de suivi, gestion et analyse de cryptomonnaies basé sur une archi
 ---
 ## ❗ Problématique
 
-- Comment offrir aux investisseurs en cryptomonnaies une plateforme centralisée, intelligente et personnalisée pour suivre en temps réel les prix, gérer leur portefeuille, recevoir des alertes, analyser leur historique d'investissement et bénéficier d’un accompagnement automatisé ?
+- Comment offrir aux investisseurs en cryptomonnaies une plateforme centralisée, intelligente et personnalisée pour suivre en temps réel les prix, gérer leur portefeuille, recevoir des alertes et analyser leur historique d'investissement ?
 
 ## 🧱 Structure du projet
 
