@@ -1,6 +1,8 @@
 # 💸 Kryptos Project
-
 Projet global de suivi, gestion et analyse de cryptomonnaies basé sur une architecture **microservices (Spring Boot)** avec un **frontend React**.
+
+![Dashboard Kryptos](./kryptos-ui.png)
+
 
 ---
 ## ❗ Problématique
@@ -12,13 +14,22 @@ Projet global de suivi, gestion et analyse de cryptomonnaies basé sur une archi
 ```bash
 kryptos_project/
 │
-├── ms-crypto                # Service de données de marché (Binance, Coinbase)
-├── ms-crypto-wallet         # Gestion des portefeuilles utilisateurs
-├── ms-crypto-alerts         # Système d'alertes de prix personnalisées
-├── ms-crypto-chatBot        # ChatBot crypto intelligent (Spring AI, NLP)
-├── identity-crypto-service  # Authentification, autorisation (JWT)
-├── front_Kryptos            # Frontend React (interface utilisateur)
-└── README.md
+├── identity-crypto-service   # Service d'authentification (Spring Security, JWT)
+│
+├── ms-crypto                 # Récupération des données marché (Binance, Coinbase)
+│
+├── ms-crypto-wallet          # Gestion des portefeuilles utilisateurs
+│
+├── ms-crypto-alerts          # Alertes de prix personnalisables
+│
+├── ms-crypto-chatBot         # ChatBot crypto (Spring AI, NLP)
+│
+├── front_Kryptos             # Application frontend React (interface utilisateur)
+│
+├── docker-compose.yml        # Orchestration de l’ensemble des services
+│
+└── README.md                 # Documentation du projet
+
 ```
 
 ---
@@ -34,32 +45,13 @@ cd kryptos_project
 
 ---
 
-### 2. Lancer les microservices
+### 2. Lancer le projet
 
-Depuis chaque dossier :
-
-```bash
-cd ms-crypto
-./mvnw spring-boot:run
-```
-
-Répéter pour :
-- `ms-crypto-wallet`
-- `ms-crypto-alerts`
-- `ms-crypto-chatBot`
-- `identity-crypto-service`
-
----
-
-### 3. Lancer le frontend React
 
 ```bash
-cd front_Kryptos
-npm install
-npm run dev
+docker compose up -d
 ```
 
----
 
 ## 📈 Fonctionnalités principales
 
