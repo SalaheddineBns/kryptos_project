@@ -126,4 +126,4 @@ npm run dev
 - Salaheddine BENKHANOUS  
 - Khalid KOUTTANE  
 - Sid Ali AMRANI  
-- Tony
+- Tony Incorvaia
