@@ -1,0 +1,16 @@
+
+
+exchanges:
+  binance:
+    url: https://api.binance.com/api/v3/ticker/price?symbol=
+  kraken:
+    url: https://api.kraken.com/0/public/Ticker?pair=
+  coinbase:
+    url: https://api.coinbase.com/v2/prices/{symbol}-USD/spot
+  kucoin:
+    url: https://api.kucoin.com/api/v1/market/orderbook/level1?symbol=
+spring:
+  application:
+    name: ms-crypto
+server:
+  port: 8999
