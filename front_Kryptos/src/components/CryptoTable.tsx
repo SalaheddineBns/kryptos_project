@@ -65,9 +65,13 @@ function getCryptoRows(data: Array<{ service: string; data: any }>) {
         }
       } else if (serviceData.service === "Coinbase") {
         const rates = serviceData.data.data?.rates;
-        if (rates && rates[crypto] && rates["USD"]) {
-          // Prix USD = USD/BTC (ex: 67000 pour BTC)
-          const val = Number(rates["USD"]) / Number(rates[crypto]);
+        console.log("DEBUG Coinbase", {
+          crypto,
+          rates,
+          value: rates?.[crypto],
+        });
+        if (rates && rates[crypto]) {
+          const val = Number(rates[crypto]);
           row.Coinbase = val;
           priceUSD = Math.max(priceUSD, val);
         } else {

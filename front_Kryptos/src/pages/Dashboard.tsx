@@ -26,6 +26,11 @@ const Dashboard = () => {
         const results = await Promise.all(
           symbols.map((symbol) => fetchMarketData(symbol))
         );
+        // Log pour debug : vérifier les valeurs coinbase pour chaque symbole
+        console.log(
+          "Coinbase results:",
+          results.map((r) => r.coinbase.data)
+        );
         setCryptoData([
           {
             service: "Binance",
@@ -38,14 +43,10 @@ const Dashboard = () => {
             service: "Coinbase",
             data: {
               data: {
-                rates: symbols.reduce(
-                  (acc, symbol, idx) => {
-                    acc[symbol] = 1; // Pour compatibilité avec CryptoTable
-                    acc["USD" + symbol] = responseForCoinbaseUSD(results[idx]);
-                    return acc;
-                  },
-                  { USD: results[0].coinbase.data.amount }
-                ),
+                rates: symbols.reduce((acc, symbol, idx) => {
+                  acc[symbol] = results[idx].coinbase.data.amount;
+                  return acc;
+                }, {}),
               },
             },
           },
