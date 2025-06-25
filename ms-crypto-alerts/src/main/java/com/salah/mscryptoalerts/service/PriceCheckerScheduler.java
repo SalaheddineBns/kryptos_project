@@ -41,7 +41,7 @@ public class PriceCheckerScheduler {
                         "Il a " + (alert.getCondition() == PriceCondition.ABOVE ? "dépassé" : "chuté sous") +
                         " votre seuil de " + alert.getTargetPrice() + " USD.";
 
-                //emailService.send(alert.getUserEmail(), subject, body);
+                emailService.send(alert.getUserEmail(), subject, body);
 
                 System.out.println("🔔 Alerte déclenchée !");
                 System.out.println("Utilisateur : " + alert.getUserEmail());

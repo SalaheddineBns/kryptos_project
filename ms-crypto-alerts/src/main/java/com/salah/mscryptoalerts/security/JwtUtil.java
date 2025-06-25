@@ -42,6 +42,14 @@ public class JwtUtil {
                 .get("userId", Long.class); // on récupère le claim "userId"
     }
 
+    public String extractEmailFromToken(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(secret.getBytes())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .get("email", String.class);
+    }
 
 
     // ✅ Vérifie expiration + signature

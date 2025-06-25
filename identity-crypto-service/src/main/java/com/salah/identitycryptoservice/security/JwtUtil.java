@@ -24,6 +24,7 @@ public class JwtUtil {
         return Jwts.builder()
                 .setSubject(email)
                 .claim("userId", user.getUserId()) // ➕ on ajoute le userId
+                .claim("email", user.getEmail())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // 1h
                 .signWith(Keys.hmacShaKeyFor(secretKey.getBytes()), SignatureAlgorithm.HS256)
