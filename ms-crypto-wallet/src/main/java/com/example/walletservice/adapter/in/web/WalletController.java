@@ -1,7 +1,6 @@
 package com.example.walletservice.adapter.in.web;
 
-import com.example.walletservice.adapter.in.web.dto.BuyCryptoRequest;
-import com.example.walletservice.adapter.in.web.dto.TransactionResponse;
+import com.example.walletservice.adapter.in.web.dto.EthTransactionResponse;
 import com.example.walletservice.adapter.in.web.dto.WalletResponse;
 import com.example.walletservice.application.port.in.WalletUseCase;
 import com.example.walletservice.domain.Transaction;
@@ -42,17 +41,7 @@ public class WalletController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/{userId}/deposit")
-    public ResponseEntity<Void> deposit(@PathVariable Long userId, @RequestParam BigDecimal amount) {
-        walletUseCase.deposit(userId, amount);
-        return ResponseEntity.ok().build();
-    }
 
-    @PostMapping("/{userId}/withdraw")
-    public ResponseEntity<Void> withdraw(@PathVariable Long userId, @RequestParam BigDecimal amount) {
-        walletUseCase.withdraw(userId, amount);
-        return ResponseEntity.ok().build();
-    }
     @PutMapping("/{userId}/link-address")
     public ResponseEntity<Void> linkEthAddress(
             @PathVariable Long userId,
@@ -66,29 +55,19 @@ public class WalletController {
 
         return ResponseEntity.ok().build();
     }
-    @PostMapping("/{userId}/buy")
-    public ResponseEntity<Void> buyCrypto(
-            @PathVariable Long userId,
-            @RequestBody BuyCryptoRequest request
-    ) {
-        walletUseCase.buyCrypto(userId, request.getSymbol(), request.getAmount());
-        return ResponseEntity.ok().build();
-    }
 
-    @GetMapping("/{userId}/transactions")
-    public ResponseEntity<List<TransactionResponse>> getTransactions(@PathVariable Long userId) {
-        List<Transaction> transactions = walletUseCase.getTransactionsByUserId(userId);
 
-        List<TransactionResponse> responses = transactions.stream().map(tx -> {
-            TransactionResponse r = new TransactionResponse();
-            r.setAmount(tx.getAmount());
-            r.setSymbol(tx.getSymbol());
-            r.setType(tx.getType());
-            r.setTimestamp(tx.getTimestamp());
-            return r;
-        }).collect(Collectors.toList());
+    @GetMapping("/{userId}/eth-transactions")
+    public ResponseEntity<List<EthTransactionResponse>> getEthTransactions(@PathVariable Long userId) {
+        Wallet wallet = walletUseCase.getWalletByUserId(userId);
+        String ethAddress = wallet.getLinkedEthAddress();
 
-        return ResponseEntity.ok(responses);
+        if (ethAddress == null || !ethAddress.startsWith("0x")) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        List<EthTransactionResponse> ethTxs = blockchainAdapter.getTransactions(ethAddress);
+        return ResponseEntity.ok(ethTxs);
     }
 
 

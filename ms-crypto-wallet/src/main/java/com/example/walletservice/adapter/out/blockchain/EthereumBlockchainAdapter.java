@@ -1,60 +1,62 @@
 package com.example.walletservice.adapter.out.blockchain;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
+import com.example.walletservice.adapter.in.web.dto.EthTransactionResponse;
+import com.fasterxml.jackson.databind.JsonNode;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.DefaultBlockParameterName;
-import org.web3j.protocol.core.methods.response.EthGetBalance;
-import org.web3j.protocol.http.HttpService;
-import org.web3j.utils.Convert;
+import org.springframework.web.client.RestTemplate;
 
-import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
-import java.math.BigInteger;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
-/**
- * Adapter qui interroge le réseau Ethereum (via Infura) pour lire le solde d'une adresse ETH.
- */
+@Slf4j
 @Component
-@RequiredArgsConstructor
 public class EthereumBlockchainAdapter {
 
-    @Value("${blockchain.ethereum.node-url}")
-    private String nodeUrl;
+    private static final String ETHERSCAN_API_KEY = "NF5IGWV52PK4KZCVEF4NXPFD2ZQ8SNHGKA"; // sécurise-le dans application.properties
+    private static final String ETHERSCAN_API_URL = "https://api.etherscan.io/api";
 
-    private Web3j web3j;
-
-    /**
-     * Initialise le client Web3j une seule fois après l'injection de dépendances.
-     */
-    @PostConstruct
-    public void init() {
-        this.web3j = Web3j.build(new HttpService(nodeUrl));
-    }
-
-    /**
-     * Lit le solde (en ETH) d'une adresse Ethereum publique.
-     *
-     * @param address Adresse publique Ethereum (0x...)
-     * @return Solde en ETH (BigDecimal)
-     */
     public BigDecimal getEthBalance(String address) {
-        try {
-            EthGetBalance balanceResponse = web3j
-                    .ethGetBalance(address, DefaultBlockParameterName.LATEST)
-                    .send();
+        String url = ETHERSCAN_API_URL +
+                "?module=account&action=balance&address=" + address +
+                "&tag=latest&apikey=" + ETHERSCAN_API_KEY;
 
-            BigInteger balanceInWei = balanceResponse.getBalance();
-            BigDecimal balanceInEth = Convert.fromWei(balanceInWei.toString(), Convert.Unit.ETHER);
+        ResponseEntity<JsonNode> response = new RestTemplate().getForEntity(url, JsonNode.class);
 
-            System.out.println("Solde ETH de " + address + " = " + balanceInEth + " ETH"); // 🔍 Ajout ici
-
-            return balanceInEth;
-
-        } catch (Exception e) {
-            throw new RuntimeException("Erreur lors de la lecture du solde ETH", e);
+        if (response.getStatusCode().is2xxSuccessful()) {
+            String balanceWei = response.getBody().get("result").asText();
+            return new BigDecimal(balanceWei).divide(BigDecimal.TEN.pow(18));
         }
+
+        return BigDecimal.ZERO;
     }
 
+    public List<EthTransactionResponse> getTransactions(String address) {
+        String url = ETHERSCAN_API_URL +
+                "?module=account&action=txlist" +
+                "&address=" + address +
+                "&startblock=0&endblock=99999999&sort=desc" +
+                "&apikey=" + ETHERSCAN_API_KEY;
+
+        ResponseEntity<JsonNode> response = new RestTemplate().getForEntity(url, JsonNode.class);
+        List<EthTransactionResponse> transactions = new ArrayList<>();
+
+        if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+            JsonNode result = response.getBody().get("result");
+            for (JsonNode tx : result) {
+                EthTransactionResponse tr = new EthTransactionResponse();
+                tr.setHash(tx.get("hash").asText());
+                tr.setFrom(tx.get("from").asText());
+                tr.setTo(tx.get("to").asText());
+                tr.setValue(new BigDecimal(tx.get("value").asText()).divide(BigDecimal.TEN.pow(18)));
+                tr.setTimestamp(Instant.ofEpochSecond(Long.parseLong(tx.get("timeStamp").asText())));
+                transactions.add(tr);
+            }
+        }
+
+        return transactions;
+    }
 }
