@@ -6,8 +6,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+import org.web3j.protocol.Web3j;
+import org.web3j.protocol.core.DefaultBlockParameterName;
+import org.web3j.protocol.core.methods.response.EthGetBalance;
+import org.web3j.protocol.http.HttpService;
+import org.web3j.utils.Convert;
 
+import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,24 +23,41 @@ import java.util.List;
 @Component
 public class EthereumBlockchainAdapter {
 
-    private static final String ETHERSCAN_API_KEY = "NF5IGWV52PK4KZCVEF4NXPFD2ZQ8SNHGKA"; // sécurise-le dans application.properties
+    // URL d’Infura (Web3j)
+    private static final String NODE_URL = "https://mainnet.infura.io/v3/1b3573a9c71545b18f336bebbcfd296f";
+
+    // Clé API d’Etherscan
+    private static final String ETHERSCAN_API_KEY = "NF5IGWV52PK4KZCVEF4NXPFD2ZQ8SNHGKA";
     private static final String ETHERSCAN_API_URL = "https://api.etherscan.io/api";
 
-    public BigDecimal getEthBalance(String address) {
-        String url = ETHERSCAN_API_URL +
-                "?module=account&action=balance&address=" + address +
-                "&tag=latest&apikey=" + ETHERSCAN_API_KEY;
+    private Web3j web3j;
 
-        ResponseEntity<JsonNode> response = new RestTemplate().getForEntity(url, JsonNode.class);
-
-        if (response.getStatusCode().is2xxSuccessful()) {
-            String balanceWei = response.getBody().get("result").asText();
-            return new BigDecimal(balanceWei).divide(BigDecimal.TEN.pow(18));
-        }
-
-        return BigDecimal.ZERO;
+    @PostConstruct
+    public void init() {
+        this.web3j = Web3j.build(new HttpService(NODE_URL));
     }
 
+    /**
+     * Récupère le solde ETH d'une adresse avec Web3j (via Infura).
+     */
+    public BigDecimal getEthBalance(String address) {
+        try {
+            EthGetBalance balanceResponse = web3j
+                    .ethGetBalance(address, DefaultBlockParameterName.LATEST)
+                    .send();
+
+            BigInteger balanceInWei = balanceResponse.getBalance();
+            return Convert.fromWei(balanceInWei.toString(), Convert.Unit.ETHER);
+
+        } catch (Exception e) {
+            log.error("Erreur lors de la lecture du solde ETH via Web3j", e);
+            return BigDecimal.ZERO;
+        }
+    }
+
+    /**
+     * Récupère l'historique des transactions depuis Etherscan.
+     */
     public List<EthTransactionResponse> getTransactions(String address) {
         String url = ETHERSCAN_API_URL +
                 "?module=account&action=txlist" +
