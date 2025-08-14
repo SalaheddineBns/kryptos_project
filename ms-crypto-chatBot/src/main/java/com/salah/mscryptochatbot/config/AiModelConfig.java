@@ -18,7 +18,7 @@ public class AiModelConfig {
 
         OpenAiApi openAiApi = new OpenAiApi.Builder()
                 .baseUrl("https://api.together.xyz")
-                .apiKey("be6cc8ad3c8e4e7832e172bba36d83ff71c9e46ff10ae901736c738344aac890")
+                .apiKey("xxxxxxxxxxxxxx")
                 .build();
 
         return new OpenAiChatModel(openAiApi, options);
